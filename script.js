@@ -1,6 +1,6 @@
 // COLE SUAS CREDENCIAIS AQUI:
 const SUPABASE_URL = "https://jqxsdllyyoxrqckcerdl.supabase.co";
-const SUPABASE_KEY = "sb_publishable_XgRECumJZ4lY54zN8bqMYQ__lskKK9o";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeHNkbGx5eW94cnFja2NlcmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzE1NTgsImV4cCI6MjA2ODEwNzU1OH0.CsFA1IIMWPge8mYPyfuA539jZZy-cMaofw0oKKsYYzI";
 
 // Configuração do Supabase
 
