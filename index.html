@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lista de Tarefas</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -17,6 +17,92 @@
 
   <ul id="taskList"></ul>
 
-  <script src="script.js"></script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+
+  <!-- Configurações das credenciais Supabase -->
+  <script>
+    // Defina aqui suas credenciais (ou importe de config.js)
+    window.SUPABASE_URL = "https://jqxsdllyyoxrqckcerdl.supabase.co";
+    window.SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxeHNkbGx5eW94cnFja2NlcmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1MzE1NTgsImV4cCI6MjA2ODEwNzU1OH0.CsFA1IIMWPge8mYPyfuA539jZZy-cMaofw0oKKsYYzI";
+  </script>
+
+  <!-- Seu código JS -->
+  <script>
+    const supabase = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+
+    const taskForm = document.getElementById("taskForm");
+    const taskList = document.getElementById("taskList");
+
+    async function fetchTasks() {
+      try {
+        const { data, error } = await supabase.from('tarefas').select('*');
+        if (error) throw error;
+        renderTasks(data);
+      } catch (err) {
+        console.error("Erro ao buscar tarefas:", err);
+      }
+    }
+
+    function renderTasks(tasks) {
+      taskList.innerHTML = "";
+      tasks.forEach(task => {
+        const titulo = task.titulo || "";
+        const conteudo = task.conteudo || "";
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${titulo}</strong><br>${conteudo}<br><br>
+          <button onclick="editTask(${task.id}, '${titulo.replace(/'/g, "\\'")}', '${conteudo.replace(/'/g, "\\'")}')">Editar</button>
+          <button onclick="deleteTask(${task.id})">Excluir</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    taskForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value.trim();
+      const content = document.getElementById("content").value.trim();
+
+      if (title && content) {
+        try {
+          const { error } = await supabase.from('tarefas').insert([{ titulo: title, conteudo: content }]);
+          if (error) throw error;
+          taskForm.reset();
+          fetchTasks();
+        } catch (err) {
+          console.error("Erro ao adicionar tarefa:", err);
+        }
+      }
+    };
+
+    async function deleteTask(id) {
+      try {
+        const { error } = await supabase.from('tarefas').delete().eq('id', id);
+        if (error) throw error;
+        fetchTasks();
+      } catch (err) {
+        console.error("Erro ao excluir tarefa:", err);
+      }
+    }
+
+    async function editTask(id, oldTitle, oldContent) {
+      const newTitle = prompt("Novo título:", oldTitle);
+      const newContent = prompt("Novo conteúdo:", oldContent);
+
+      if (newTitle && newContent) {
+        try {
+          const { error } = await supabase.from('tarefas').update({ titulo: newTitle, conteudo: newContent }).eq('id', id);
+          if (error) throw error;
+          fetchTasks();
+        } catch (err) {
+          console.error("Erro ao editar tarefa:", err);
+        }
+      }
+    }
+
+    // Carregar tarefas ao abrir a página
+    fetchTasks();
+  </script>
 </body>
 </html>
