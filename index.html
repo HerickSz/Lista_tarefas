@@ -33,6 +33,8 @@
   </div>
 
   <script>
+    // Substitua pela URL do seu backend (Node.js Express) hospedado
+    // Por exemplo: 'https://meuapp.onrender.com' ou 'https://meuapp.netlify.app'
     const API_URL = 'https://tarefas-herick.netlify.app/';
 
     const taskForm = document.getElementById('taskForm');
@@ -46,17 +48,22 @@
     let currentEditId = null;
 
     async function fetchTasks() {
-      const res = await fetch(`${API_URL}/tarefas`);
-      const data = await res.json();
-      renderTasks(data);
+      try {
+        const res = await fetch(`${API_URL}/tarefas`);
+        if (!res.ok) throw new Error('Falha ao buscar tarefas');
+        const data = await res.json();
+        renderTasks(data);
+      } catch (error) {
+        alert('Erro ao carregar tarefas: ' + error.message);
+      }
     }
 
     function renderTasks(tasks) {
       taskList.innerHTML = '';
-      tasks.forEach(task => {
+      tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.innerHTML = `
-          <strong>${task.titulo}</strong><br>
+          <strong>${index + 1}. ${task.titulo}</strong><br>
           ${task.conteudo}<br><br>
           <button onclick="openEditModal('${task._id}', '${task.titulo.replace(/'/g, "\\'")}', '${task.conteudo.replace(/'/g, "\\'")}')">Editar</button>
           <button onclick="deleteTask('${task._id}')">Excluir</button>
@@ -71,19 +78,30 @@
       const content = document.getElementById('content').value.trim();
 
       if (title && content) {
-        await fetch(`${API_URL}/tarefas`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ titulo: title, conteudo: content }),
-        });
-        taskForm.reset();
-        fetchTasks();
+        try {
+          const res = await fetch(`${API_URL}/tarefas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: title, conteudo: content }),
+          });
+          if (!res.ok) throw new Error('Erro ao adicionar tarefa');
+          taskForm.reset();
+          fetchTasks();
+        } catch (error) {
+          alert(error.message);
+        }
       }
     });
 
     async function deleteTask(id) {
-      await fetch(`${API_URL}/tarefas/${id}`, { method: 'DELETE' });
-      fetchTasks();
+      if (!confirm('Deseja realmente excluir esta tarefa?')) return;
+      try {
+        const res = await fetch(`${API_URL}/tarefas/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Erro ao excluir tarefa');
+        fetchTasks();
+      } catch (error) {
+        alert(error.message);
+      }
     }
 
     function openEditModal(id, title, content) {
@@ -100,16 +118,21 @@
 
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      await fetch(`${API_URL}/tarefas/${currentEditId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          titulo: editTitle.value.trim(),
-          conteudo: editContent.value.trim()
-        }),
-      });
-      closeModal();
-      fetchTasks();
+      try {
+        const res = await fetch(`${API_URL}/tarefas/${currentEditId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titulo: editTitle.value.trim(),
+            conteudo: editContent.value.trim()
+          }),
+        });
+        if (!res.ok) throw new Error('Erro ao editar tarefa');
+        closeModal();
+        fetchTasks();
+      } catch (error) {
+        alert(error.message);
+      }
     });
 
     fetchTasks();

@@ -1,4 +1,4 @@
-const API_URL = 'https://tarefas-herick.netlify.app/'; // Altere para a URL da sua API se necessário
+const API_URL = 'ac-wz3ds5z-shard-00-01.8x38wyz.mongodb.net:27017'; // Altere para a URL da sua API se necessário
 
 const taskForm = document.getElementById('taskForm');
 const taskList = document.getElementById('taskList');
