@@ -1,4 +1,4 @@
-const API_URL = 'https://tarefas-herick.netlify.app'; // Altere para a URL da sua API se necessário
+const API_URL = 'https://lista-tarefas-sdvo.onrender.com'; // Altere para a URL da sua API se necessário
 
 const taskForm = document.getElementById('taskForm');
 const taskList = document.getElementById('taskList');
